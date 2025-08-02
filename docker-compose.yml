@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  flight-prediction-api:
+    build: .
+    container_name: flight-delay-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app/src
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  flight-prediction-dashboard:
+    build: .
+    container_name: flight-delay-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONPATH=/app/src
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    depends_on:
+      - flight-prediction-api
+    command: ["streamlit", "run", "src/dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    restart: unless-stopped
+
+volumes:
+  flight_data:
+  flight_models:
+  flight_logs:
+
+networks:
+  default:
+    name: flight-prediction-network
