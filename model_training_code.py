@@ -38,14 +38,14 @@ weather_not_delayed = df[df['DELAY_DUE_WEATHER_YN'] == 'No'].sample(n=len(weathe
 # Combine and shuffle
 stratified_df = pd.concat([weather_delayed, weather_not_delayed]).sample(frac=1, random_state=42).reset_index(drop=True)
 
-# 1. Clean data by removing irrelevant columns
+# 1. Clean data  by removing irrelevant columns
 delay_columns = [
     'DELAY_DUE_CARRIER', 'DELAY_DUE_WEATHER', 'DELAY_DUE_NAS',
     'DELAY_DUE_SECURITY', 'DELAY_DUE_LATE_AIRCRAFT'
 ]
 stratified_df = stratified_df.drop(columns=delay_columns, errors='ignore')
 
-# 2. Feature engineering function
+# 2. Feature engineering function 
 def create_features(df):
     df['FL_DATE'] = pd.to_datetime(df['FL_DATE'])
     df['MONTH'] = df['FL_DATE'].dt.month
